@@ -2,8 +2,10 @@ defmodule Philter.Spotify do
 
   @process Philter.Spotify.Query
   @supervisor Philter.Spotify.Supervisor
-  @ngrok_url "http://c844569f.ngrok.io/twiml?song="
+  @ngrok_url "http://e6bf2bac.ngrok.io/twiml?song="
   @spotify_url "https://api.spotify.com/v1/search?type=track&q="
+  @musixmatch_url "http://api.musixmatch.com/ws/1.1/track.search?apikey=ec75e8c12b697fe4fa77c8e954238146&"
+  @lyrics_url "http://api.musixmatch.com/ws/1.1/track.lyrics.get?apikey=ec75e8c12b697fe4fa77c8e954238146&"
 
   alias ExTwilio
 
@@ -13,10 +15,15 @@ defmodule Philter.Spotify do
   end
 
   def search(song, twilio_data) do
-    %{:body => response} = HTTPotion.get(@spotify_url <> URI.encode(song))
+    # %{:body => response} = HTTPotion.get(@spotify_url <> URI.encode(song))
+    %{:body => response} = HTTPotion.get(@musixmatch_url <> URI.encode("q_track=#{song}"))
     {:ok, body} = Poison.decode(response)
-    url = get_url(body)
-    notify_success(url, twilio_data)
+    track = get_track_id(body)
+    %{:body => resp} = HTTPotion.get(@lyrics_url <> URI.encode("track_id=#{track}"))
+    {:ok, lyric_info} = Poison.decode(resp)
+    new_lyric = get_lyric(lyric_info)
+    IO.puts new_lyric
+    notify_success(new_lyric, twilio_data)
     # song
     # |> spawn_search(twilio_data)
     # |> await_results
@@ -27,6 +34,18 @@ defmodule Philter.Spotify do
     |> get_in(["tracks", "items"])
     |> List.first
     |> get_in(["preview_url"])
+  end
+
+  def get_track_id(body) do
+    body
+    |> get_in(["message", "body", "track_list"])
+    |> List.first
+    |> get_in(["track", "track_id"])
+  end
+
+  def get_lyric(body) do
+    body
+    |> get_in(["message", "body", "lyrics", "lyrics_body"])
   end
 
   def spawn_search(song, twilio_data) do
@@ -76,14 +95,14 @@ defmodule Philter.Spotify do
     ExTwilio.Message.create([
       From: to,
       To: from,
-      Body: "URL: " <> "#{URI.encode_www_form(preview_url)}"
+      Body: "Lyrics: " <> preview_url
     ])
 
-    ExTwilio.Call.create([
-      From: to,
-      To: from,
-      Url: @ngrok_url <> "#{URI.encode_www_form(preview_url)}"
-    ])
+    # ExTwilio.Call.create([
+    #   From: to,
+    #   To: from,
+    #   Url: @ngrok_url <> "#{URI.encode_www_form(preview_url)}"
+    # ])
   end
 
   defp kill(pid, ref) do
