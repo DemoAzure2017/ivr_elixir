@@ -2,7 +2,7 @@ defmodule Philter.Spotify do
 
   @process Philter.Spotify.Query
   @supervisor Philter.Spotify.Supervisor
-  @ngrok_url "http://e6bf2bac.ngrok.io/twiml?song="
+  @ngrok_url "https://obscure-mesa-41378.herokuapp.com/twiml?song="
   @spotify_url "https://api.spotify.com/v1/search?type=track&q="
   @musixmatch_url "http://api.musixmatch.com/ws/1.1/track.search?apikey=ec75e8c12b697fe4fa77c8e954238146&"
   @lyrics_url "http://api.musixmatch.com/ws/1.1/track.lyrics.get?apikey=ec75e8c12b697fe4fa77c8e954238146&"
