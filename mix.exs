@@ -17,7 +17,7 @@ defmodule Philter.Mixfile do
   # Type `mix help compile.app` for more information.
   def application do
     [mod: {Philter, []},
-     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext, :ex_twilio]]
+     applications: [:phoenix, :phoenix_pubsub, :phoenix_html, :cowboy, :logger, :gettext, :ex_twilio, :httpotion]]
   end
 
   # Specifies which paths to compile per environment.
@@ -34,6 +34,8 @@ defmodule Philter.Mixfile do
      {:phoenix_live_reload, "~> 1.0", only: :dev},
      {:ex_twilio, "~> 0.3.0"},
      {:gettext, "~> 0.11"},
-     {:cowboy, "~> 1.0"}]
+     {:cowboy, "~> 1.0"},
+     {:httpotion, "~> 3.0.2"}
+    ]
   end
 end

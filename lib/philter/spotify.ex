@@ -2,7 +2,7 @@ defmodule Philter.Spotify do
 
   @process Philter.Spotify.Query
   @supervisor Philter.Spotify.Supervisor
-  @ngrok_url "http://3fff0066.ngrok.io/twiml?song="
+  @ngrok_url "http://c844569f.ngrok.io/twiml?song="
   @spotify_url "https://api.spotify.com/v1/search?type=track&q="
 
   alias ExTwilio
@@ -13,8 +13,7 @@ defmodule Philter.Spotify do
   end
 
   def search(song, twilio_data) do
-    %{:body => response} =
-      HTTPotion.get(@spotify_url <> URI.encode(song))
+    %{:body => response} = HTTPotion.get(@spotify_url <> URI.encode(song))
     {:ok, body} = Poison.decode(response)
     url = get_url(body)
     notify_success(url, twilio_data)
@@ -77,7 +76,7 @@ defmodule Philter.Spotify do
     ExTwilio.Message.create([
       From: to,
       To: from,
-      Body: "Your clip is on the way!"
+      Body: "URL: " <> "#{URI.encode_www_form(preview_url)}"
     ])
 
     ExTwilio.Call.create([
